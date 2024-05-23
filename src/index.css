@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
+* {
+    font-family: "Ubuntu", sans-serif;
+}
+
+/* DISABLING SELECTION */
+.app {
+    /* DISABLE SELECTION */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Standard */
+
+    /* DISABLE BLUE HIGHLIGHT WHEN CLICK [FOR MOBILE CHROME] */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.app:focus {
+    outline: none !important;
+}
+
+/* Removing backgound color caused by auto complete  */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* CUSTOM SCROLL BAR */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Hide Arrows from input type number */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+    height: 0px;
+    width: 0px;
+}
+
+.app:focus {
+    outline: none !important;
+}
+
+/* CUSTOM STYLE */
+input {
+    outline: none;
+}
+.heading {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.press-1:active {
+    scale: 0.99;
+}
+.press-2:active {
+    scale: 0.98;
+}
+.press-3:active {
+    scale: 0.97;
+}
+.press-4:active {
+    scale: 0.96;
+}
+.press-5:active {
+    scale: 0.95;
+}
+
+.custom-container {
+    padding-right: 32px;
+    padding-left: 32px;
+}
+@media screen and (min-width: 768px) {
+    .custom-container {
+        padding-right: 56px;
+        padding-left: 56px;
+    }
+}
+@media screen and (min-width: 1024px) {
+    .custom-container {
+        padding-right: 112px;
+        padding-left: 112px;
+    }
+}
+.icon {
+    font-size: 1.8rem;
+    color: theme("colors.fourth");
+    display: inline-block;
+}
+.custom-shadow {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+.custom-shadow-1 {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
+}
+
+.table-container {
+    border: 1px solid gray;
+    border-radius: 7px;
+    margin: auto;
+}
+.custom-table {
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+.custom-table .table-heading {
+    background-color: theme("colors.fifth");
+    /* color: white; */
+    font-weight: 600;
+}
+.custom-table td {
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid gray;
+}
+.custom-table td div {
+    padding: 5px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-table td {
+    padding: 10px;
+}
+
+/*  */
+.table-sale-order {
+    white-space: nowrap;
+}
+.table-sale-order .head {
+    background-color: theme("colors.fifth");
+    font-weight: 600;
+}
+.table-sale-order td {
+    padding: 5px 10px;
+    border: 1px solid rgb(179, 179, 179);
+}
