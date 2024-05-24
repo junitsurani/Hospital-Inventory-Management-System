@@ -43,11 +43,14 @@ function BillReceipt() {
     let [pmId, setPmId] = useState(
         GC?.purchaseMasterData[GC?.purchaseMasterData?.length - 1]?.PM_ID + 1 || 1
     );
+    
     let [jvmId, setJvmId] = useState(
         GC?.journalVoucherMasterData[GC?.journalVoucherMasterData?.length - 1]?.JVM_ID + 1 || 1
     );
     let [pmType, setPmType] = useState("");
     let [pmNo, setPmNo] = useState("");
+    let [prmTypeId, setPrmTypeId] = useState("");
+    
     let [pmInwardNo, setPmInwardNo] = useState("");
     let [pmInwardDate, setPmInwardDate] = useState("");
     let [pmReference, setPmReference] = useState("");
@@ -85,14 +88,14 @@ function BillReceipt() {
     let [pdDbCr, setPdDbCr] = useState("CR");
     let [pdId, setPdId] = useState("");
     let [pdParticular, setPdParticular] = useState("");
-    let [pdPack, setPdPack] = useState("");
+    let [pdRate, setpdRate] = useState("");
     let [pdBatchNo, setPdBatchNo] = useState("");
     let [pdDoe, setPdDoe] = useState("");
     let [pdMRP, setPdMRP] = useState("");
     let [jvmTypeNo, setJvmTypeNo] = useState("");
     let [jvmBackupTypeNo, setBackupJvmTypeNo] = useState("");
     let [pdPurRate, setPdPurRate] = useState("");
-    let [pdSalesRate, setPdSalesRate] = useState("");
+    let [pdRateQty, setpdRateQty] = useState("");
     let [pdQty, setPdQty] = useState("");
     let [pdFree, setPdFree] = useState("");
     let [pdTotal, setPdTotal] = useState("");
@@ -116,6 +119,7 @@ function BillReceipt() {
     // Toal, Grand Total, Qty
     //
     let [purchaseDetailsArray, setPurchaseDetailsArray] = useState([]);
+    const [cumulativeTotal, setCumulativeTotal] = useState(0);
     let [purchaseDetailsArrayTotal, setPurchaseDetailsArrayTotal] = useState(0);
     let [purchaseDetailsArrayGrandTotal, setPurchaseDetailsArrayGrandTotal] = useState(0);
     let [purchaseDetailsArrayQty, setPurchaseDetailsArrayQty] = useState(0);
@@ -127,54 +131,20 @@ function BillReceipt() {
     // For PDF And CSV
     //
     let [apiRef, setApiRef] = useState();
-    const result = pdSalesRate *pdQty ;
+    const result = pdRateQty *pdQty ;
 
     //
     // Fetch Purchase Master and Purchase Detail Data
     // Only Called Once
     //
-    useEffect(function () {
-        FetchData("POST", "/api/vouchers/get-details/" + localStorage.getItem("lmId")).then(
-            (res) => {
-                console.log(res);
-                setMaxId(res?.data?.max_id);
-                setJvmId(res?.data?.max_id + 1);
-                if (res?.isSuccess) {
-                    if (res?.data) {
-                        var counts = [];
-                        GC?.setJournalVoucherDetailsData(res?.data?.journalVoucherDetailsData);
-                        GC?.setJournalVoucherMasterData(res?.data?.journalVoucherMasterData);
+    useEffect(() => {
+        let total = 0;
+        purchaseDetailsArray.forEach((element) => {
+            total += parseFloat(element.pdGrandTotal) || 0;
+        });
+        setCumulativeTotal(total);
+    }, [purchaseDetailsArray]);
 
-                        console.log(res?.data?.journalVoucherDetailsData);
-                        console.log(res?.data?.journalVoucherMasterData);
-                        res?.data?.journalVoucherMasterData.map((item) => {
-                            if (parseInt(localStorage.getItem("lmId")) === item.COMP_ID) {
-                                if (item.JVM_TYPE_WISE_ID) {
-                                    counts.push(item.JVM_TYPE_WISE_ID);
-                                } else {
-                                    counts.push(0);
-                                }
-                            }
-                        });
-                        console.log(counts);
-
-                        var maxTyepWiseId = 0;
-                        if (counts.length !== 0) {
-                            maxTyepWiseId = Math.max(...counts);
-                        }
-                        setJvmTypeNo(maxTyepWiseId + 1);
-                        setBackupJvmTypeNo(maxTyepWiseId + 1);
-                    }
-                } else {
-                    setJvmTypeNo(1);
-                    GC?.setJournalVoucherDetailsData([]);
-                    GC?.setJournalVoucherMasterData([]);
-
-                    toast.error(res?.message || "Failed to purchase data");
-                }
-            }
-        );
-    }, []);
 
       // Function to update the date and time every second
       const intervalId = setInterval(() => {
@@ -197,6 +167,7 @@ function BillReceipt() {
     function clearPurchaseMasterForm() {
         setPmType("");
         setPmNo(backupPNo);
+        setJvmTypeNo(jvmBackupTypeNo);
         setPmInwardNo("");
         setPmInwardDate("");
         setPmReference("");
@@ -222,12 +193,12 @@ function BillReceipt() {
         setPdDbCr("CR");
         setPdId("");
         setPdParticular("");
-        setPdPack("");
+        setpdRate("");
         setPdBatchNo("");
         setPdDoe("");
         setPdMRP("");
         setPdPurRate("");
-        setPdSalesRate("");
+        setpdRateQty("");
         setPdQty("");
         setPdFree("");
         setPdTotal("");
@@ -493,27 +464,27 @@ function BillReceipt() {
         }
 
 
-        if (!pdParticular) {
-            toast.error("Please enter Particular");
-            return;
-        }
+        // if (!pdParticular) {
+        //     toast.error("Please enter Particular");
+        //     return;
+        // }
 
-        if (!pdPack) {
-            toast.error("Please enter Pack");
-            return;
-        }
+        // if (!pdRate) {
+        //     toast.error("Please enter Pack");
+        //     return;
+        // }
 
-        if (!pdMRP) {
-            toast.error("Please enter MRP");
-            return;
-        }
+        // if (!pdMRP) {
+        //     toast.error("Please enter MRP");
+        //     return;
+        // }
 
-        if (!pdPurRate) {
-            toast.error("Please enter Pur Rate");
-            return;
-        }
+        // if (!pdPurRate) {
+        //     toast.error("Please enter Pur Rate");
+        //     return;
+        // }
 
-        if (!pdSalesRate) {
+        if (!pdRateQty) {
             toast.error("Please enter Sales Rate");
             return;
         }
@@ -523,10 +494,10 @@ function BillReceipt() {
             return;
         }
 
-        if (!pdTotal) {
-            toast.error("Please enter Total");
-            return;
-        }
+        // if (!pdTotal) {
+        //     toast.error("Please enter Total");
+        //     return;
+        // }
 
         setPurchaseDetailsArrayGrandTotal((old) => {
             return old + pdGrandTotal;
@@ -540,12 +511,12 @@ function BillReceipt() {
             pdDbCr,
             pdId,
             pdParticular,
-            pdPack,
+            pdRate,
             pdBatchNo,
             pdDoe,
             pdMRP,
             pdPurRate,
-            pdSalesRate,
+            pdRateQty,
             pdQty,
             pdFree,
             pdTotal,
@@ -713,12 +684,12 @@ function BillReceipt() {
                         pdId: element.PD_ID,
                         pdItemId: element.PD_ITEM_ID,
                         pdParticular: item_name,
-                        pdPack: element.PD_PACK,
+                        pdRate: element.PD_PACK,
                         pdBatchNo: element.PD_BATCH,
                         pdDoe: element.PD_DOE,
                         pdMRP: element.PD_MRP,
                         pdPurRate: element.PD_PUR_RATE,
-                        pdSalesRate: element.PD_SALES_RATE,
+                        pdRateQty: element.PD_SALES_RATE,
                         pdQty: element.PD_QTY,
                         pdFree: element.PD_FREE,
                         pdTotal: element.PD_PUR_RATE * element.PD_QTY,
@@ -1249,22 +1220,22 @@ function BillReceipt() {
                                                 setPdId(
                                                     element?.getAttribute("data-item-id") || ""
                                                 );
-                                                setPdPack(element?.getAttribute("data-pack") || "");
+                                                setpdRate(element?.getAttribute("data-pack") || "");
                                                 setPdMRP(element?.getAttribute("data-mrp") || "");
                                                 setPdPurRate(
                                                     element?.getAttribute("data-purchase-rate") ||
                                                     ""
                                                 );
-                                                setPdSalesRate(
+                                                setpdRateQty(
                                                     element?.getAttribute("data-sale-rate") || ""
                                                 );
                                                 setSgst(element?.getAttribute("data-sgst") || "");
                                                 setCgst(element?.getAttribute("data-cgst") || "");
                                                 setIgst(element?.getAttribute("data-igst") || "");
                                             }}
-                                            list="itemIdList"
+                                            // list="itemIdList"
                                         />
-                                        <datalist id="itemIdList">
+                                        {/* <datalist id="itemIdList">
                                             {GC?.itemMasterData?.map((element, index) => {
                                                 return (
                                                     <option
@@ -1282,7 +1253,7 @@ function BillReceipt() {
                                                     ></option>
                                                 );
                                             })}
-                                        </datalist>
+                                        </datalist> */}
                                     </label>
                                 </div>
                                 <div className="w-[30]">
@@ -1303,22 +1274,22 @@ function BillReceipt() {
                                                 setPdId(
                                                     element?.getAttribute("data-item-id") || ""
                                                 );
-                                                setPdPack(element?.getAttribute("data-pack") || "");
+                                                setpdRate(element?.getAttribute("data-pack") || "");
                                                 setPdMRP(element?.getAttribute("data-mrp") || "");
                                                 setPdPurRate(
                                                     element?.getAttribute("data-purchase-rate") ||
                                                     ""
                                                 );
-                                                setPdSalesRate(
+                                                setpdRateQty(
                                                     element?.getAttribute("data-sale-rate") || ""
                                                 );
                                                 setSgst(element?.getAttribute("data-sgst") || "");
                                                 setCgst(element?.getAttribute("data-cgst") || "");
                                                 setIgst(element?.getAttribute("data-igst") || "");
                                             }}
-                                            list="itemIdList"
+                                            // list="itemIdList"
                                         />
-                                        <datalist id="itemIdList">
+                                        {/* <datalist id="itemIdList">
                                             {GC?.itemMasterData?.map((element, index) => {
                                                 return (
                                                     <option
@@ -1336,7 +1307,7 @@ function BillReceipt() {
                                                     ></option>
                                                 );
                                             })}
-                                        </datalist>
+                                        </datalist> */}
                                     </label>
                                 </div>
                                 <div className="w-[50px]">
@@ -1346,8 +1317,19 @@ function BillReceipt() {
                                             type="text"
                                             className="w-full p-2 mt-1 border rounded"
                                             disabled={false}
-                                            value={pdPack}
-                                            onChange={(e) => setPdPack(e.target.value)}
+                                            value={pdRate}
+                                            onChange={(e) => {
+                                                let rate = e.target.value;
+                                                let total = Number(rate * pdQty);
+                                                let discountAmount = (total * pdDiscPer) / 100;
+
+                                                
+                                                setpdRate(e.target.value)
+                                                setpdRateQty(rate * pdQty);
+                                                setPdDiscAmt(discountAmount);
+                                                setPdTotalAfterDisc(total - discountAmount);
+                                                setPdGrandTotal(total - discountAmount);
+                                            }}
                                         />
                                     </label>
                                 </div>
@@ -1363,20 +1345,15 @@ function BillReceipt() {
                                             onKeyDown={handlekeyAdd}
                                             onChange={(e) => {
                                                 let qty = e.target.value;
-                                                let total = Number(pdPurRate * qty);
+                                                let total = Number(pdRate * qty);
                                                 let discountAmount = (total * pdDiscPer) / 100;
 
-                                                let totalGst =
-                                                    Number(sgst) + Number(cgst) + Number(igst);
-                                                let totalAmtAfterGst =
-                                                    total + (total * totalGst) / 100;
                                                 
-                                                setPdSalesRate(qty * pdPack);
+                                                setpdRateQty(qty * pdRate);
                                                 setPdQty(qty);
-                                                setPdTotal(pdPurRate * qty);
                                                 setPdDiscAmt(discountAmount);
                                                 setPdTotalAfterDisc(total - discountAmount);
-                                                setPdGrandTotal(totalAmtAfterGst - discountAmount);
+                                                setPdGrandTotal(total - discountAmount);
                                             }}
                                         />
                                     </label>
@@ -1412,25 +1389,25 @@ function BillReceipt() {
                                             type="number"
                                             className="w-full p-2 mt-1 border rounded "
                                             disabled={true}
-                                            value={pdSalesRate}
+                                            value={pdRateQty}
                                             onChange={(e) => {
-                                                setPdSalesRate(e.target.value);
+                                                setpdRateQty(e.target.value);
 
                                                 // Remove calculations related to sales rate
 
                                                 // Recalculate based on purchase rate * quantity
-                                                let total = Number(pdPurRate * pdQty);
-                                                let discountAmount = (total * pdDiscPer) / 100;
+                                                // let total = Number(pdPurRate * pdQty);
+                                                // let discountAmount = (total * pdDiscPer) / 100;
 
-                                                let totalGst =
-                                                    Number(sgst) + Number(cgst) + Number(igst);
-                                                let totalAmtAfterGst =
-                                                    total + (total * totalGst) / 100;
+                                                // let totalGst =
+                                                //     Number(sgst) + Number(cgst) + Number(igst);
+                                                // let totalAmtAfterGst =
+                                                //     total + (total * totalGst) / 100;
 
-                                                setPdTotal(pdPurRate * pdQty);
-                                                setPdDiscAmt(discountAmount);
-                                                setPdTotalAfterDisc(total - discountAmount);
-                                                setPdGrandTotal(totalAmtAfterGst - discountAmount);
+                                                // setPdTotal(pdPurRate * pdQty);
+                                                // setPdDiscAmt(discountAmount);
+                                                // setPdTotalAfterDisc(total - discountAmount);
+                                                // setPdGrandTotal(total - discountAmount);
                                             }}
                                         />
                                     </label>
@@ -1497,13 +1474,13 @@ function BillReceipt() {
                                             value={pdDiscPer}
                                             onChange={(e) => {
                                                 let discountPercentage = e.target.value;
-                                                let discountAmount =
-                                                    (pdTotal * discountPercentage) / 100;
+                                                let total = Number(pdRate * pdQty);
+                                                let discountAmount = (total * discountPercentage) / 100;
 
                                                 setPdDiscPer(discountPercentage);
                                                 setPdDiscAmt(discountAmount);
-                                                setPdTotalAfterDisc(pdTotal - discountAmount);
-                                                setPdGrandTotal(pdTotal - discountAmount);
+                                                setPdTotalAfterDisc(total - discountAmount);
+                                                setPdGrandTotal(total - discountAmount);
                                             }}
                                         />
                                     </label>
@@ -1611,21 +1588,25 @@ function BillReceipt() {
                                 </thead>
                                 <tbody>
                                     {purchaseDetailsArray.map((element, index) => {
+                                         // Calculate the cumulative total for the current row
+                                        const currentCumulativeTotal = purchaseDetailsArray
+                                        .slice(0, index + 1) // Consider elements up to the current index
+                                        .reduce((acc, curr) => acc + (parseFloat(curr.pdGrandTotal) || 0), 0);
+
                                         return (
                                             <tr key={index}>
 
-                                                <td>{element.pdItemId}</td>
+                                                <td>{index + 1}</td>
                                                 <td>{element.pdItemId}</td>
                                                 <td>{element.pdParticular}</td>
                                                 <td>{element.pdParticular}</td>
-                                                <td>{element.pdPack}</td>
+                                                <td>{element.pdRate}</td>
                                                 <td>{element.pdQty}</td>
-                                                <td>{element.pdSalesRate}</td>
+                                                <td>{element.pdRateQty}</td>
                                                 <td>{element.pdDiscPer}</td>
                                                 <td>{element.pdDiscAmt}</td>
                                                 <td>{element.pdTotalAfterDisc}</td>
-                                                <td>{element.pdGrandTotal}</td>
-                                                <td>{element.lmNarration}</td>
+                                                <td>{currentCumulativeTotal}</td>                                                <td>{element.lmNarration}</td>
                                                 {/* <td>{element.pdPurRate}</td> */}
                                                 {/* <td>{element.pdBatchNo}</td> */}
                                                 {/* <td className="min-w-[200px]">{element.pdDoe}</td> */}
