@@ -49,12 +49,14 @@ function PatientRegistration() {
     let [lmLinkId, setLmLinkId] = useState("");
     let [lmCrLimit, setLmCrLimit] = useState("");
     let [prmDate, setPrmDate] = useState("");
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
     let [age, setAge] = useState(''); // State for age in years
     let [monthDiff, setMonthDiff] = useState(''); // State for difference in months
     let [dayDiff, setDayDiff] = useState(''); // State for difference in days
 
     let [pmOPDType, setPmOPDType] = useState("O");
-    let [pmOldCaseType, setOldCaseType] = useState("No");
+    let [pmOldCaseType, setOldCaseType] = useState("Mobile No");
     let [pmGenderType, setGenderType] = useState("M");
     let [pmMstatusType, setMstatusType] = useState("Married");
     let [pmTitle, setPmTitle] = useState("");
@@ -98,6 +100,10 @@ function PatientRegistration() {
 
     const handleCheckboxMLC = () => {
       setIsCheckedMLC(!isCheckedMLC);
+    };
+
+    const handleTodaysDate = (newDate) => {
+        setDate(newDate);
     };
 
     const handleDateChange = (newDateStr) => {
@@ -155,6 +161,7 @@ function PatientRegistration() {
           const hours = currentDate.getHours().toString().padStart(2, "0");
           const minutes = currentDate.getMinutes().toString().padStart(2, "0");
           const seconds = currentDate.getSeconds().toString().padStart(2, "0");
+
     
           // Update the state with the current date and time
           setDateTime(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
@@ -383,6 +390,9 @@ function PatientRegistration() {
         setDialogBoxTitle("Add Patient Details");
         setCanEdit(true);
         clearForm();
+
+        const now = new Date();
+        setTime(now.toTimeString().split(' ')[0]); // Set current time in HH:MM:SS format
 
         setLmLedgerId(GC?.ledgerMasterData[GC?.ledgerMasterData.length - 1]?.LM_ID + 1);
         setLmReferenceNo(
@@ -712,15 +722,27 @@ function PatientRegistration() {
                     title1={DialogBoxTitle}
                     title2={"Patient Registration"}
                 >
+                    <form className="max-w-5xl mx-auto">
+
                     <div
-                        className="grid grid-cols-1 p-0.4 gap-x-10 gap-y-1 md:grid-cols-1 lg:grid-cols-5 xl:lg:grid-cols-5 max-h-[30vh] overflow-y-auto hide-scrollbar"
+                        className="grid grid-cols-1 p-2 gap-x-10 gap-y-2 md:grid-cols-1 lg:grid-cols-5 xl:lg:grid-cols-5 max-h-[100vh] overflow-y-auto hide-scrollbar"
                         onKeyDown={handleKeyPress}>
                        
-                        <input
-                            type="text"
-                            value={dateTime}
-                            readOnly>
-                        </input>
+                       <DateTopLabeled
+                            label="Date"
+                            value={date}
+                            onChange={(e) => handleTodaysDate(e.target.value)}
+                            className="w-[100]"
+                            minWidth="5px"
+                        />
+                        <TextFieldTopLabeled
+                            label="Time"
+                            placeholder="Enter Time"
+                            value={time}
+                            className="w-[100]"
+                            minWidth="5px"
+                            onChange={(e) => setTime(e.target.value)}
+                        />
                           
                         <TextFieldTopLabeled
                             label="Patient Id"
@@ -755,12 +777,8 @@ function PatientRegistration() {
                             minWidth='5px'
                             setState={handleCheckboxMLC}
                          />
-                    </div>
-                    <div
-                        className="grid grid-cols-1 p-0.4 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-5 xl:lg:grid-cols-2 max-h-[30vh] overflow-y-auto hide-scrollbar"
-                        onKeyDown={handleKeyPress}>
-                        
-                        <div className="w-[100]">
+                   
+                            <div className="w-[100]">
                                 <label className="text-xs">
                                     <div className="">
                                         Old Case<span className="text-red-600">*</span>
@@ -774,8 +792,9 @@ function PatientRegistration() {
                                         list="pmOldCaseType"
                                     />
                                     <datalist id="pmOldCaseType">
-                                        <option value="Yes"></option>
-                                        <option value="No"></option>
+                                        <option value="Mobile No"></option>
+                                        <option value="IPD"></option>
+                                        <option value="OPD"></option>
                                        
                                     </datalist>
                                 </label>
@@ -787,21 +806,21 @@ function PatientRegistration() {
                             minWidth='5px'
                             value={lmSearch}
                             onChange={(e) => setLmSearch(e.target.value)}
-                        ></TextFieldTopLabeled>
+                            ></TextFieldTopLabeled>
                     </div>
                     
                     
-                        <div className="grid grid-cols-1 p-0.4 md:grid-cols-4 lg:grid-cols-4 gap-10"
+                        <div className="grid grid-cols-1 p-2 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-2 max-h-[100vh]"
                             onKeyDown={handleKeyPress}>
 
-                            <div className="w-[100]">
+                            <div className="max-w-[50]">
                                 <label className="text-xs">
                                     <div className="">
                                         OPD/IPD<span className="text-red-600">*</span>
                                     </div>
                                     <input
                                         type="text"
-                                        className="w-full p-2 mt-1 border rounded"
+                                        className="w-1/2 p-2 mt-1 border rounded"
                                         value={pmOPDType}
                                         label="OPD/IPD"
                                         onChange={(e) => setPmOPDType(e.target.value)}
@@ -814,14 +833,14 @@ function PatientRegistration() {
                                     </datalist>
                                 </label>
                             </div>
-                            <div className="w-[100p%]">
+                            <div className="max-w-[50]">
                                 <label className="text-xs">
                                     <div className="">
                                         Title<span className="text-red-600">*</span>
                                     </div>
                                     <input
                                         type="text"
-                                        className="w-full p-2 mt-1 border rounded"
+                                        className="w-1/2 p-2 mt-1 border rounded"
                                         value={pmTitle}
                                         label="Title"
                                         onChange={(e) => setPmTitle(e.target.value)}
@@ -838,7 +857,7 @@ function PatientRegistration() {
                            
                             <TextFieldTopLabeled
                                 className="w-full"
-                                minWidth={150}
+                                minWidth={100}
                                 label="Name"
                                 placeholder="Enter"
                                 required={true}
@@ -865,20 +884,28 @@ function PatientRegistration() {
                                        
                                     </datalist>
                                 </label>
-                            </div>                       
-                        </div>
+                            </div>
+                            <FileUploadTopLabeled
+                                label="Photo"
+                                // value={lmLogo}
+                                files={lmLogo}
+                                onChange={(e) => setLmLogo(e.target.files[0])}
+                                accept="image/*"
+                            ></FileUploadTopLabeled>              
+                                     
+                        {/* </div>
                         <div
-                            className="grid grid-cols-1 p-0.4 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-4 xl:lg:grid-cols-6 max-h-[30vh] overflow-y-auto hide-scrollbar"
-                            onKeyDown={handleKeyPress}>
+                        className="grid grid-cols-1 p-2 gap-x-10 gap-y-1 md:grid-cols-1 lg:grid-cols-4 xl:lg:grid-cols-5 max-h-[100vh] overflow-y-auto hide-scrollbar"
+                    onKeyDown={handleKeyPress}> */}
 
-                            <div className="w-[100px]">
+                            <div className="w-[100]">
                                 <label className="text-xs">
                                     <div className="">
                                         Marrital Status<span className="text-red-600">*</span>
                                     </div>
                                     <input
                                         type="text"
-                                        className="w-full p-2 mt-1 border rounded"
+                                        className="w-1/2 p-2 mt-1 border rounded"
                                         value={pmMstatusType}
                                         label="Marrital Status"
                                         onChange={(e) => setMstatusType(e.target.value)}
@@ -887,22 +914,10 @@ function PatientRegistration() {
                                     <datalist id="pmMarritalType">
                                         <option value="Married"></option>
                                         <option value="Unmarried"></option>
-                                       
+                                    
                                     </datalist>
                                 </label>
                             </div>
-                            <FileUploadTopLabeled
-                                label="Photo"
-                                // value={lmLogo}
-                                files={lmLogo}
-                                // className="w-1/2"
-                                className="w-full "
-                                minWidth={150}
-                                // minWidth='5px'
-                                onChange={(e) => setLmLogo(e.target.files[0])}
-                                accept="image/*"
-                            ></FileUploadTopLabeled>
-                       
                             <DateTopLabeled
                                     label="DOB"
                                     value={prmDate}
@@ -917,7 +932,6 @@ function PatientRegistration() {
                                             type="text"
                                             className="w-full p-2 mt-1 border rounded"
                                             value={age}
-                                            disabled
                                         />
                                     </label>
                                 </div>
@@ -928,7 +942,6 @@ function PatientRegistration() {
                                             type="text"
                                             className="w-full p-2 mt-1 border rounded"
                                             value={monthDiff}
-                                            disabled
                                         />
                                     </label>
                                 </div>
@@ -939,14 +952,13 @@ function PatientRegistration() {
                                             type="text"
                                             className="w-full p-2 mt-1 border rounded"
                                             value={dayDiff}
-                                            disabled
                                         />
                                     </label>
                                 </div>                       
                             </div>
 
                         <div
-                        className="grid grid-cols-1 p-0.4 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-4 xl:lg:grid-cols-6  max-h-[30vh] overflow-y-auto hide-scrollbar"
+                        className="grid grid-cols-1 p-2 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-4 xl:lg:grid-cols-6  max-h-[30vh] overflow-y-auto hide-scrollbar"
                         onKeyDown={handleKeyPress}>
                         
                         <TextFieldTopLabeled
@@ -1036,7 +1048,7 @@ function PatientRegistration() {
                     </div>
                        
                         <div
-                            className="grid grid-cols-1 p-0.4 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-3 xl:lg:grid-cols-3  max-h-[30vh] overflow-y-auto hide-scrollbar"
+                            className="grid grid-cols-1 p-2 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-3 xl:lg:grid-cols-3  max-h-[30vh] overflow-y-auto hide-scrollbar"
                             onKeyDown={handleKeyPress}>
 
                          <div className="w-[100]">
@@ -1104,7 +1116,7 @@ function PatientRegistration() {
                             </div>
                         </div>
                         <div
-                            className="grid grid-cols-1 p-0.4 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-2 xl:lg:grid-cols-2  max-h-[30vh] overflow-y-auto hide-scrollbar"
+                            className="grid grid-cols-1 p-2 gap-x-4 gap-y-1 md:grid-cols-1 lg:grid-cols-2 xl:lg:grid-cols-2  max-h-[30vh] overflow-y-auto hide-scrollbar"
                             onKeyDown={handleKeyPress}>
 
                             <TextFieldTopLabeled
@@ -1155,6 +1167,7 @@ function PatientRegistration() {
                             />
                         </div>
                     </div>
+                    </form>
                 </DialogBox>
             </div>
         </div>

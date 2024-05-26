@@ -6,7 +6,7 @@ function CustomTextField2(props) {
             </label>
             <input
                 type="file"
-                className="p-1.5 border rounded grow min-w-[250px] text-xs placeholder:text-xs focus:border-first"
+                className="p-1.5 border rounded grow text-xs placeholder:text-xs focus:border-first"
                 id="id"
                 placeholder={props.placeholder}
                 value={props.value}
